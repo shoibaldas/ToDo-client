@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
 
 const AddEmployee = () => {
   const {
@@ -19,7 +20,40 @@ const AddEmployee = () => {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
+    fetch("http://localhost:5000/employees", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        if (data.success) {
+          localStorage.setItem("user", JSON.stringify(data.results));
+          Swal.fire({
+            icon: "success",
+            title: "Added Successfully!",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong, try later!",
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+
+    // reset Field
+    resetField("name");
+    resetField("designation");
+    resetField("email");
+    resetField("phone");
+    resetField("address");
   };
 
   return (
@@ -27,20 +61,22 @@ const AddEmployee = () => {
       <h2 className="text-2xl font-bold mb-8">Add Employee</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-         {/* Employee's Name */}
-        <div className="flex flex-col">
-          <label htmlFor="name" className="font-medium block">
-            Employee's Name
-          </label>
-          <input
-            {...register("name", { required: "Name is required" })}
-            type="text"
-            className="form-input bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
-          />
-          {errors.name && (
-            <span className="text-red-500 text-sm">{errors.name.message}</span>
-          )}
-        </div>
+          {/* Employee's Name */}
+          <div className="flex flex-col">
+            <label htmlFor="name" className="font-medium block">
+              Employee's Name
+            </label>
+            <input
+              {...register("name", { required: "Name is required" })}
+              type="text"
+              className="form-input bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
+            />
+            {errors.name && (
+              <span className="text-red-500 text-sm">
+                {errors.name.message}
+              </span>
+            )}
+          </div>
 
           {/* Designation */}
           <div className="flex flex-col">
@@ -88,7 +124,7 @@ const AddEmployee = () => {
             <input
               {...register("phone", { required: "Phone is required" })}
               type="tel"
-              pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+              //pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
               className="form-input bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
             />
             {errors.phone && (
