@@ -18,6 +18,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             Add Employee
           </Link>
         </li>
+        <li className="mb-2">
+          <Link to="/create-task" className="text-blue-300 hover:text-blue-200">
+            Create Task
+          </Link>
+        </li>
       </ul>
     </div>
   );
