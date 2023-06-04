@@ -20,7 +20,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         </li>
         <li className="mb-2">
           <Link to="/create-task" className="text-blue-300 hover:text-blue-200">
-            Create Task
+            Assign Task
+          </Link>
+        </li>
+        <li className="mb-2">
+          <Link to="/task-list" className="text-blue-300 hover:text-blue-200">
+            Task List
           </Link>
         </li>
       </ul>

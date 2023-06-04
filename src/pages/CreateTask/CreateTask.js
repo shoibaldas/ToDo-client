@@ -1,51 +1,74 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 
 const CreateTask = () => {
+  const [employees, setEmployees] = useState([]);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    resetField,
+    reset,
   } = useForm({
     mode: "onChange",
     defaultValues: {
       taskName: "",
+      employeeName: "",
     },
   });
 
-  const onSubmit = (data) => {
-    fetch("http://localhost:5000/tasks", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        if (data.success) {
-          localStorage.setItem("user", JSON.stringify(data.results));
-          Swal.fire({
-            icon: "success",
-            title: "Added Successfully!",
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Something went wrong, try later!",
-          });
-        }
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/employees")
+      .then((response) => {
+        setEmployees(response.data.data);
       })
       .catch((error) => {
-        console.error("Error:", error);
+        console.log(error);
       });
+  }, []);
 
-    // reset Field
-    resetField("taskName");
+  const onSubmit = (data) => {
+    const { employeeName, taskName } = data;
+
+    const selectedEmployee = JSON.parse(employeeName);
+
+    if (selectedEmployee) {
+      const updatedEmployee = {
+        ...selectedEmployee,
+        task: { name: taskName },
+      };
+
+      fetch(`http://localhost:5000/employees/${selectedEmployee._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedEmployee),
+      })
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log("Success:", responseData);
+          if (responseData.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Task Added Successfully!",
+            });
+            reset();
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong, try again!",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
   };
 
   return (
@@ -53,6 +76,40 @@ const CreateTask = () => {
       <h2 className="text-2xl font-bold mb-8">Create Task</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-6 mb-4">
+          {/* Employee Name */}
+
+          <div className="flex flex-col">
+            <label htmlFor="employeeName" className="font-medium block">
+              Employee Name
+            </label>
+            <select
+              {...register("employeeName", {
+                required: "Employee name is required",
+              })}
+              className="form-select bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
+            >
+              <option value="">Select an employee</option>
+              {employees?.map((employee) => {
+                const ifTaskExist =
+                  employee.task && Object.keys(employee.task).length > 0;
+
+                if (!ifTaskExist) {
+                  return (
+                    <option key={employee._id} value={JSON.stringify(employee)}>
+                      {employee.name}
+                    </option>
+                  );
+                }
+                return null;
+              })}
+            </select>
+            {errors.employeeName && (
+              <span className="text-red-500 text-sm">
+                {errors.employeeName.message}
+              </span>
+            )}
+          </div>
+
           {/* Task Name */}
           <div className="flex flex-col">
             <label htmlFor="taskName" className="font-medium block">
@@ -63,9 +120,9 @@ const CreateTask = () => {
               type="text"
               className="form-input bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
             />
-            {errors.name && (
+            {errors.taskName && (
               <span className="text-red-500 text-sm">
-                {errors.name.message}
+                {errors.taskName.message}
               </span>
             )}
           </div>
