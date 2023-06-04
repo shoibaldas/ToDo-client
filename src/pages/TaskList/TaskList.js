@@ -18,11 +18,11 @@ const TaskList = () => {
   }, []);
 
   const toggleExpand = (taskId) => {
-    setExpandedTaskDetails((prevExpandedTasks) => {
-      if (prevExpandedTasks.includes(taskId)) {
-        return prevExpandedTasks.filter((id) => id !== taskId);
+    setExpandedTaskDetails((expandedTask) => {
+      if (expandedTask.includes(taskId)) {
+        return expandedTask.filter((id) => id !== taskId);
       } else {
-        return [...prevExpandedTasks, taskId];
+        return [...expandedTask, taskId];
       }
     });
   };

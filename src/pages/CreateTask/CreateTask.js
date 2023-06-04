@@ -73,7 +73,7 @@ const CreateTask = () => {
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <h2 className="text-2xl font-bold mb-8">Create Task</h2>
+      <h2 className="text-2xl font-bold mb-8">Assign Task</h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-6 mb-4">
           {/* Employee Name */}

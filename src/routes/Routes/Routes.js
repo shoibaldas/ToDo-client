@@ -4,6 +4,7 @@ import Home from "../../pages/Home/Home";
 import AddEmployee from "../../pages/AddEmployee/AddEmployee";
 import CreateTask from "../../pages/CreateTask/CreateTask";
 import TaskList from "../../pages/TaskList/TaskList";
+import EmployeeList from "../../pages/EmployeeList/EmployeeList";
 
 export const routes = createBrowserRouter([
   {
@@ -23,9 +24,13 @@ export const routes = createBrowserRouter([
         element: <CreateTask></CreateTask>,
       },
       {
-        path:"/task-list",
-        element:<TaskList></TaskList>
-      }
+        path: "/task-list",
+        element: <TaskList></TaskList>,
+      },
+      {
+        path: "/employee-list",
+        element: <EmployeeList>x</EmployeeList>,
+      },
     ],
   },
 ]);

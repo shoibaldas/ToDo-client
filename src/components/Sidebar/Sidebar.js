@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
-
   return (
     /* Sidebar */
     <div
@@ -14,8 +13,19 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
       <ul>
         <li className="mb-2">
-          <Link to="/add-employee" className="text-blue-300 hover:text-blue-200">
+          <Link
+            to="/add-employee"
+            className="text-blue-300 hover:text-blue-200"
+          >
             Add Employee
+          </Link>
+        </li>
+        <li className="mb-2">
+          <Link
+            to="/employee-list"
+            className="text-blue-300 hover:text-blue-200"
+          >
+            Employee List
           </Link>
         </li>
         <li className="mb-2">
