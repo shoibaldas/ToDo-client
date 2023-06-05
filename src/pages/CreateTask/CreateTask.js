@@ -119,11 +119,10 @@ const CreateTask = () => {
             <label htmlFor="taskName" className="font-medium block">
               Task Name
             </label>
-            <input
+            <textarea
               {...register("taskName", { required: "Task name is required" })}
-              type="text"
               className="form-input bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
-            />
+            ></textarea>
             {errors.taskName && (
               <span className="text-red-500 text-sm">
                 {errors.taskName.message}
@@ -133,12 +132,12 @@ const CreateTask = () => {
         </div>
 
         {/* Submit Button */}
-        <div>
+        <div className="grid grid-cols-1">
           <button
             type="submit"
-            className="bg-orange-700 hover:bg-orange-800 text-white py-2 px-4 rounded-md"
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md "
           >
-            Create
+            Assign
           </button>
         </div>
       </form>
