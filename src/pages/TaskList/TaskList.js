@@ -72,8 +72,9 @@ const TaskList = () => {
     setshowModalTransfer(true);
   };
 
+//editing task name and updating
   const handleSaveClick = () => {
-    const newTaskData = {
+    const newTaskData = { 
       ...selectedTask,
       task: {
         ...selectedTask.task,
@@ -118,28 +119,8 @@ const TaskList = () => {
     const transferToEmployee = tasks.find(
       (employee) => employee._id === selectedEmployeeId
     );
-    // Remove the task from the current employee
-    // const updatedTasks = tasks.map((employee) => {
-    //   if (employee._id === selectedTask._id) {
-    //     return {
-    //       ...employee,
-    //       task: null,
-    //     };
-    //   } else {
-    //     return employee;
-    //   }
-    // });
 
-    //console.log(updatedTasks)
-
-    // Assign the task to the selected employee
-    // const updatedTransferToEmployee = {
-    //   ...transferToEmployee,
-    //   task: selectedTask.task,
-    // };
-
-    //console.log(updatedTransferToEmployee)
-    // Update the task list in the local state
+    // Updating the task list
     const updatedTaskList = tasks.map((employee) => {
       if (employee._id === selectedTask._id) {
         return {
@@ -156,10 +137,8 @@ const TaskList = () => {
       }
     });
 
-    console.log(updatedTaskList);
-
-    // Update the task list in the local state
     setTasks(updatedTaskList);
+
     fetch(`http://localhost:5000/transfer/employee`, {
       method: "PUT",
       headers: {
@@ -189,6 +168,7 @@ const TaskList = () => {
       });
   };
 
+  //Deleting a task
   const handleDeleteClick = (id) => {
     fetch(`http://localhost:5000/delete/task/${id}`, {
       method: "DELETE",
@@ -223,6 +203,7 @@ const TaskList = () => {
       });
   };
 
+  //filtering out the task attribute from the employee array
   const filteredTasks = tasks.filter((task) => task.task);
 
   return (

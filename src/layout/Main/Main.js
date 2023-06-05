@@ -29,6 +29,7 @@ const Main = () => {
                 <LuPanelRightClose size={20} />
               )}
             </button>
+            <h2 className="text-gray-800 font-bold text-lg">To Do</h2>
           </div>
           {/* Content */}
           <div className="p-6">
