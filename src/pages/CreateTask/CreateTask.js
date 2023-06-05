@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
+import { v4 as uuidv4 } from "uuid";
 
 const CreateTask = () => {
   const [employees, setEmployees] = useState([]);
@@ -15,7 +16,6 @@ const CreateTask = () => {
     mode: "onChange",
     defaultValues: {
       taskName: "",
-      employeeName: "",
     },
   });
 
@@ -32,13 +32,17 @@ const CreateTask = () => {
 
   const onSubmit = (data) => {
     const { employeeName, taskName } = data;
+    const taskId = uuidv4();
 
     const selectedEmployee = JSON.parse(employeeName);
 
     if (selectedEmployee) {
       const updatedEmployee = {
         ...selectedEmployee,
-        task: { name: taskName },
+        task: {
+          id: taskId, // Add the taskId to the task object
+          name: taskName,
+        },
       };
 
       fetch(`http://localhost:5000/employees/${selectedEmployee._id}`, {

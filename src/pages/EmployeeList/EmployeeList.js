@@ -69,7 +69,7 @@ const EmployeeList = () => {
       address,
       phone,
     };
-    console.log(newEmployeeData);
+
     fetch(`http://localhost:5000/update/employee/${selectedEmployee._id}`, {
       method: "PUT",
       headers: {

@@ -4,10 +4,10 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import { LuPanelLeftClose, LuPanelRightClose } from "react-icons/lu";
 
 const Main = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Set isOpen to true initially
 
-  const toggleSidebar = (isOpen) => {
-    setIsOpen(isOpen);
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen); // Toggle the value of isOpen
   };
 
   return (
@@ -20,7 +20,7 @@ const Main = () => {
           <div className="bg-gray-200 text-white flex items-center justify-between px-6 py-3">
             <button
               className="bg-orange-700 text-white px-3 py-2 rounded-md"
-              onClick={() => toggleSidebar(!isOpen)}
+              onClick={toggleSidebar} // Use toggleSidebar directly without passing any parameter
             >
               {/* Use the appropriate icon based on the sidebar state */}
               {isOpen ? (
