@@ -5,14 +5,13 @@ const EmployeeModal = ({
   employee,
   isEditing,
   closeModal,
+  editedEmployee,
   handleEditClick,
   handleSaveClick,
   handleCancelClick,
   handleDeleteClick,
   handleChange,
 }) => {
-  const { name, designation, email, address, phone } = employee;
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-3">
       <div className="bg-white p-6 rounded shadow-md h-96 overflow-x-scroll">
@@ -26,7 +25,7 @@ const EmployeeModal = ({
                 <label className="text-sm font-semibold">Name</label>
                 <input
                   type="text"
-                  value={name}
+                  value={editedEmployee.name}
                   disabled={!isEditing}
                   onChange={(e) => handleChange("name", e.target.value)}
                   className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
@@ -37,7 +36,7 @@ const EmployeeModal = ({
                 <label className="text-sm font-semibold">Designation</label>
                 <input
                   type="text"
-                  value={designation}
+                  value={editedEmployee.designation}
                   disabled={!isEditing}
                   onChange={(e) => handleChange("designation", e.target.value)}
                   className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
@@ -48,7 +47,7 @@ const EmployeeModal = ({
                 <label className="text-sm font-semibold">Email</label>
                 <input
                   type="text"
-                  value={email}
+                  value={editedEmployee.email}
                   disabled={!isEditing}
                   onChange={(e) => handleChange("email", e.target.value)}
                   className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
@@ -59,7 +58,7 @@ const EmployeeModal = ({
                 <label className="text-sm font-semibold">Address</label>
                 <input
                   type="text"
-                  value={address}
+                  value={editedEmployee.address}
                   disabled={!isEditing}
                   onChange={(e) => handleChange("address", e.target.value)}
                   className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
@@ -70,7 +69,7 @@ const EmployeeModal = ({
                 <label className="text-sm font-semibold">Phone</label>
                 <input
                   type="text"
-                  value={phone}
+                  value={editedEmployee.phone}
                   disabled={!isEditing}
                   onChange={(e) => handleChange("phone", e.target.value)}
                   className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
@@ -84,7 +83,7 @@ const EmployeeModal = ({
             {/* Delete Employee */}
             <button
               className="inline-flex items-center text-sm border border-red-900 text-red-700 px-4 py-1 rounded hover:shadow-lg hover:bg-red-800 hover:text-white"
-              onClick={handleDeleteClick}
+              onClick={() => handleDeleteClick(employee._id)}
             >
               Delete Employee
               <MdOutlineDelete></MdOutlineDelete>

@@ -5,6 +5,8 @@ import Swal from "sweetalert2";
 import { AiOutlineEdit } from "react-icons/ai";
 import { MdOutlineDelete } from "react-icons/md";
 import Loader from "../../components/Loader/Loader";
+import TaskEditModal from "../../components/TaskEditModal/TaskEditModal";
+import TaskTransferModal from "../../components/TaskTransferModal/TaskTransferModal";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -14,17 +16,6 @@ const TaskList = () => {
   const [selectedTask, setSelectedTask] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  //for editing task field
-  const [taskName, setTaskName] = useState("");
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
-
-  // for effecting the changes while editting
-  useEffect(() => {
-    if (selectedTask && selectedTask.task) {
-      setTaskName(selectedTask.task.name);
-    }
-  }, [selectedTask]);
 
   //fetching task data from employee data
   useEffect(() => {
@@ -75,23 +66,47 @@ const TaskList = () => {
     setshowModalTransfer(true);
   };
 
+  //for editing task field
+  const [editTask, setEditTask] = useState({ name: "" });
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+
+  // for effecting the changes while editting
+  useEffect(() => {
+    if (selectedTask && selectedTask.task) {
+      setEditTask({ name: selectedTask.task.name });
+    }
+  }, [selectedTask]);
+
+  const handleChange = (field, value) => {
+    //Onchange in the input field
+    setEditTask((prevTask) => ({
+      ...prevTask,
+      [field]: value,
+    }));
+  };
+
   //editing task name and updating
   const handleSaveClick = () => {
     const newTaskData = {
       ...selectedTask,
       task: {
         ...selectedTask.task,
-        name: taskName,
+        name: editTask.name, // Update the task name directly
       },
     };
 
-    fetch(`https://to-do-server-pi.vercel.app/update/task/${selectedTask._id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newTaskData),
-    })
+    console.log(newTaskData);
+
+    fetch(
+      `https://to-do-server-pi.vercel.app/update/task/${selectedTask._id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newTaskData),
+      }
+    )
       .then((response) => response.json())
       .then((responseData) => {
         console.log("Success:", responseData);
@@ -280,131 +295,29 @@ const TaskList = () => {
         ))}
       </div>
       {showModalTransfer && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-3">
-          <div className="bg-white p-6 rounded shadow-md h-40">
-            {selectedTask && (
-              <div className="border-t border-gray-200 pt-2">
-                <div className="grid grid-cols-1">
-                  <div>
-                    <label className="text-sm font-semibold block mb-3">
-                      Click "Edit" to transfer task
-                    </label>
-                    <select
-                      disabled={!isEditing}
-                      className="form-select bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
-                      value={selectedEmployeeId}
-                      onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                    >
-                      <option value="">Select an available employee</option>
-                      {tasks?.map((employee) => {
-                        const ifTaskExist =
-                          employee.task &&
-                          Object.keys(employee.task).length > 0;
-
-                        if (!ifTaskExist) {
-                          return (
-                            <option key={employee._id} value={employee._id}>
-                              {employee.name}
-                            </option>
-                          );
-                        }
-                        return null;
-                      })}
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="flex justify-end mt-6">
-              {isEditing ? (
-                <button
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 text-sm rounded"
-                  onClick={handleCancelClick}
-                >
-                  Cancel
-                </button>
-              ) : (
-                <button
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 text-sm rounded"
-                  onClick={closeModal}
-                >
-                  Close
-                </button>
-              )}
-
-              {isEditing ? (
-                <button
-                  onClick={handleTransferClick}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 text-sm rounded ml-2"
-                >
-                  Save Changes
-                </button>
-              ) : (
-                <button
-                  onClick={handleEditClick}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 text-sm rounded ml-2"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        <TaskTransferModal
+          closeModal={closeModal}
+          isEditing={isEditing}
+          handleCancelClick={handleCancelClick}
+          handleEditClick={handleEditClick}
+          handleTransferClick={handleTransferClick}
+          selectedTask={selectedTask}
+          selectedEmployeeId={selectedEmployeeId}
+          setSelectedEmployeeId={setSelectedEmployeeId}
+          tasks={tasks}
+        ></TaskTransferModal>
       )}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-3">
-          <div className="bg-white p-6 rounded shadow-md h-40">
-            {selectedTask && (
-              <div className="border-t border-gray-200 pt-2">
-                <div className="grid grid-cols-1">
-                  <div>
-                    <label className="text-sm font-semibold">Task Name</label>
-                    <input
-                      type="text"
-                      value={taskName}
-                      disabled={!isEditing}
-                      onChange={(e) => setTaskName(e.target.value)}
-                      className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="flex justify-end mt-6">
-              {isEditing ? (
-                <button
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 text-sm rounded"
-                  onClick={handleCancelClick}
-                >
-                  Cancel
-                </button>
-              ) : (
-                <button
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 text-sm rounded"
-                  onClick={closeModal}
-                >
-                  Close
-                </button>
-              )}
-
-              {isEditing ? (
-                <button
-                  onClick={handleSaveClick}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 text-sm rounded ml-2"
-                >
-                  Save Changes
-                </button>
-              ) : (
-                <button
-                  onClick={handleEditClick}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 text-sm rounded ml-2"
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        <TaskEditModal
+          task={selectedTask}
+          isEditing={isEditing}
+          editTask={editTask}
+          closeModal={closeModal}
+          handleEditClick={handleEditClick}
+          handleSaveClick={handleSaveClick}
+          handleCancelClick={handleCancelClick}
+          handleChange={handleChange}
+        ></TaskEditModal>
       )}
     </div>
   );
