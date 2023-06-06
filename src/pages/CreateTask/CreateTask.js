@@ -21,7 +21,7 @@ const CreateTask = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/employees")
+      .get("https://to-do-server-pi.vercel.app/employees")
       .then((response) => {
         setEmployees(response.data.data);
       })
@@ -45,7 +45,7 @@ const CreateTask = () => {
         },
       };
 
-      fetch(`http://localhost:5000/employees/${selectedEmployee._id}`, {
+      fetch(`https://to-do-server-pi.vercel.app/employees/${selectedEmployee._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

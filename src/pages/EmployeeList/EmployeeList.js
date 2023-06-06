@@ -15,7 +15,7 @@ const EmployeeList = () => {
   //for fetching employee data
   useEffect(() => {
     axios
-      .get("http://localhost:5000/employees")
+      .get("https://to-do-server-pi.vercel.app/employees")
       .then((response) => {
         setEmployees(response.data.data);
         setLoading(false);
@@ -82,7 +82,7 @@ const EmployeeList = () => {
       ...editedEmployee,
     };
 
-    fetch(`http://localhost:5000/update/employee/${selectedEmployee._id}`, {
+    fetch(`https://to-do-server-pi.vercel.app/update/employee/${selectedEmployee._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -97,7 +97,7 @@ const EmployeeList = () => {
             icon: "success",
             title: "Updated Successfully!",
           });
-          const updatedEmployee = employees.map((employee) =>
+          const updatedEmployee = employees?.map((employee) =>
             employee._id === selectedEmployee._id ? newEmployeeData : employee
           );
           setEmployees(updatedEmployee);
@@ -117,7 +117,7 @@ const EmployeeList = () => {
 
   //Deleting employee
   const handleDeleteClick = (id) => {
-    fetch(`http://localhost:5000/delete/employee/${id}`, {
+    fetch(`https://to-do-server-pi.vercel.app/delete/employee/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -154,7 +154,7 @@ const EmployeeList = () => {
     <div className="container mx-auto px-4">
     <h2 className="text-2xl font-bold mb-4">Employee List</h2>
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {employees.map((employee) => (
+      {employees?.map((employee) => (
         <div
           key={employee._id}
           className="bg-sky-700 shadow-md rounded-md p-2"

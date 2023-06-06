@@ -20,7 +20,7 @@ const AddEmployee = () => {
   });
 
   const onSubmit = (data) => {
-    fetch("http://localhost:5000/employees", {
+    fetch("https://to-do-server-pi.vercel.app/employees", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

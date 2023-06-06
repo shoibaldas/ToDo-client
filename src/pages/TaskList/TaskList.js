@@ -29,7 +29,7 @@ const TaskList = () => {
   //fetching task data from employee data
   useEffect(() => {
     axios
-      .get("http://localhost:5000/employees")
+      .get("https://to-do-server-pi.vercel.app/employees")
       .then((response) => {
         setTasks(response.data.data);
         setLoading(false);
@@ -85,7 +85,7 @@ const TaskList = () => {
       },
     };
 
-    fetch(`http://localhost:5000/update/task/${selectedTask._id}`, {
+    fetch(`https://to-do-server-pi.vercel.app/update/task/${selectedTask._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -100,7 +100,7 @@ const TaskList = () => {
             icon: "success",
             title: "Updated Successfully!",
           });
-          const updatedTask = tasks.map((taskData) =>
+          const updatedTask = tasks?.map((taskData) =>
             taskData._id === selectedTask._id ? newTaskData : taskData
           );
           setTasks(updatedTask);
@@ -142,7 +142,7 @@ const TaskList = () => {
 
     setTasks(updatedTaskList);
 
-    fetch(`http://localhost:5000/transfer/employee`, {
+    fetch(`https://to-do-server-pi.vercel.app/transfer/employee`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -173,7 +173,7 @@ const TaskList = () => {
 
   //Deleting a task
   const handleDeleteClick = (id) => {
-    fetch(`http://localhost:5000/delete/task/${id}`, {
+    fetch(`https://to-do-server-pi.vercel.app/delete/task/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -211,7 +211,7 @@ const TaskList = () => {
   }
 
   //filtering out the task attribute from the employee array
-  const filteredTasks = tasks.filter((task) => task.task);
+  const filteredTasks = tasks?.filter((task) => task.task);
 
   return (
     <div className="container mx-auto px-4">
