@@ -4,6 +4,7 @@ import { HiOutlineChevronDown, HiOutlineChevronUp } from "react-icons/hi";
 import Swal from "sweetalert2";
 import { AiOutlineEdit } from "react-icons/ai";
 import { MdOutlineDelete } from "react-icons/md";
+import Loader from "../../components/Loader/Loader";
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
@@ -12,6 +13,7 @@ const TaskList = () => {
   const [showModalTransfer, setshowModalTransfer] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   //for editing task field
   const [taskName, setTaskName] = useState("");
@@ -30,6 +32,7 @@ const TaskList = () => {
       .get("http://localhost:5000/employees")
       .then((response) => {
         setTasks(response.data.data);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -72,9 +75,9 @@ const TaskList = () => {
     setshowModalTransfer(true);
   };
 
-//editing task name and updating
+  //editing task name and updating
   const handleSaveClick = () => {
-    const newTaskData = { 
+    const newTaskData = {
       ...selectedTask,
       task: {
         ...selectedTask.task,
@@ -202,6 +205,10 @@ const TaskList = () => {
         console.error("Error:", error);
       });
   };
+
+  if (loading) {
+    return <Loader></Loader>;
+  }
 
   //filtering out the task attribute from the employee array
   const filteredTasks = tasks.filter((task) => task.task);

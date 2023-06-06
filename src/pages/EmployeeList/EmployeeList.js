@@ -3,12 +3,14 @@ import React, { useEffect, useState } from "react";
 import { HiOutlineEye } from "react-icons/hi";
 import Swal from "sweetalert2";
 import EmployeeModal from "../../components/EmployeeModal/EmployeeModal";
+import Loader from "../../components/Loader/Loader";
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   //for fetching employee data
   useEffect(() => {
@@ -16,6 +18,7 @@ const EmployeeList = () => {
       .get("http://localhost:5000/employees")
       .then((response) => {
         setEmployees(response.data.data);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -142,6 +145,10 @@ const EmployeeList = () => {
         console.error("Error:", error);
       });
   };
+
+  if(loading){
+    return <Loader></Loader>
+  }
 
   return (
     <div className="container mx-auto px-4">
