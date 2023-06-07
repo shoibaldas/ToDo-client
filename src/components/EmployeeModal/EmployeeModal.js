@@ -1,5 +1,6 @@
 import React from "react";
 import { MdOutlineDelete } from "react-icons/md";
+import ModalInputBoxHandler from "../ModalInputBoxHandler/ModalInputBoxHandler";
 
 const EmployeeModal = ({
   employee,
@@ -21,60 +22,40 @@ const EmployeeModal = ({
             <div className="border-t border-gray-200 pt-2"></div>
             <div className="grid grid-cols-2 gap-4">
               {/* Name */}
-              <div>
-                <label className="text-sm font-semibold">Name</label>
-                <input
-                  type="text"
-                  value={editedEmployee.name}
-                  disabled={!isEditing}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
-                />
-              </div>
+              <ModalInputBoxHandler
+                label="Name"
+                value={editedEmployee.name}
+                disabled={!isEditing}
+                onChange={(e) => handleChange("name", e.target.value)}
+              />
               {/* Designation */}
-              <div>
-                <label className="text-sm font-semibold">Designation</label>
-                <input
-                  type="text"
-                  value={editedEmployee.designation}
-                  disabled={!isEditing}
-                  onChange={(e) => handleChange("designation", e.target.value)}
-                  className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
-                />
-              </div>
+              <ModalInputBoxHandler
+                label="Designation"
+                value={editedEmployee.designation}
+                disabled={!isEditing}
+                onChange={(e) => handleChange("designation", e.target.value)}
+              />
               {/* Email */}
-              <div>
-                <label className="text-sm font-semibold">Email</label>
-                <input
-                  type="text"
-                  value={editedEmployee.email}
-                  disabled={!isEditing}
-                  onChange={(e) => handleChange("email", e.target.value)}
-                  className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
-                />
-              </div>
+              <ModalInputBoxHandler
+                label="Email"
+                value={editedEmployee.email}
+                disabled={!isEditing}
+                onChange={(e) => handleChange("email", e.target.value)}
+              />
               {/* Address */}
-              <div>
-                <label className="text-sm font-semibold">Address</label>
-                <input
-                  type="text"
-                  value={editedEmployee.address}
-                  disabled={!isEditing}
-                  onChange={(e) => handleChange("address", e.target.value)}
-                  className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
-                />
-              </div>
+              <ModalInputBoxHandler
+                label="Address"
+                value={editedEmployee.address}
+                disabled={!isEditing}
+                onChange={(e) => handleChange("address", e.target.value)}
+              />
               {/* Phone */}
-              <div>
-                <label className="text-sm font-semibold">Phone</label>
-                <input
-                  type="text"
-                  value={editedEmployee.phone}
-                  disabled={!isEditing}
-                  onChange={(e) => handleChange("phone", e.target.value)}
-                  className="bg-gray-100 border border-gray-300 px-3 py-1 rounded-md w-full"
-                />
-              </div>
+              <ModalInputBoxHandler
+                label="Phone"
+                value={editedEmployee.phone}
+                disabled={!isEditing}
+                onChange={(e) => handleChange("phone", e.target.value)}
+              />
             </div>
           </div>
         )}

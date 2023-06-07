@@ -22,7 +22,7 @@ const CreateTask = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/employees")
+      .get("https://to-do-server-pi.vercel.app/employees")
       .then((response) => {
         setEmployees(response.data.data);
       })
@@ -38,7 +38,7 @@ const CreateTask = () => {
       name: taskName,
       employeeId: employeeId,
     };
-    fetch(`http://localhost:5000/tasks`, {
+    fetch(`https://to-do-server-pi.vercel.app/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,7 @@ const CreateTask = () => {
             title: "Task Added Successfully!",
           });
           reset();
-          navigate("/task-list");
+          //navigate("/task-list");
         } else {
           Swal.fire({
             icon: "error",

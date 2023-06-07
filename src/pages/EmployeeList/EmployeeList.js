@@ -1,29 +1,19 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import { HiOutlineEye } from "react-icons/hi";
 import Swal from "sweetalert2";
 import EmployeeModal from "../../components/EmployeeModal/EmployeeModal";
 import Loader from "../../components/Loader/Loader";
+import useEmployeeReducer, {
+  reducer,
+  initialState,
+} from "../../hooks/employeeReducer";
 
 const EmployeeList = () => {
-  const [employees, setEmployees] = useState([]);
+  const { loading, employees } = useEmployeeReducer();
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  //for fetching employee data
-  useEffect(() => {
-    axios
-      .get("http://localhost:5000/employees")
-      .then((response) => {
-        setEmployees(response.data.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const closeModal = () => {
     setShowModal(false);
@@ -83,7 +73,7 @@ const EmployeeList = () => {
     };
 
     fetch(
-      `http://localhost:5000/update/employee/${selectedEmployee._id}`,
+      `https://to-do-server-pi.vercel.app/update/employee/${selectedEmployee._id}`,
       {
         method: "PUT",
         headers: {
@@ -100,10 +90,13 @@ const EmployeeList = () => {
             icon: "success",
             title: "Updated Successfully!",
           });
-          const updatedEmployee = employees?.map((employee) =>
+          const updatedEmployee = state.employees?.map((employee) =>
             employee._id === selectedEmployee._id ? newEmployeeData : employee
           );
-          setEmployees(updatedEmployee);
+          dispatch({
+            type: "FETCH_EMPLOYEES_SUCCESS",
+            payload: updatedEmployee,
+          });
           setIsEditing(false);
         } else {
           Swal.fire({
@@ -122,7 +115,7 @@ const EmployeeList = () => {
   const handleDeleteClick = (id) => {
     console.log(id);
 
-    fetch(`http://localhost:5000/delete/employee/${id}`, {
+    fetch(`https://to-do-server-pi.vercel.app/delete/employee/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -133,10 +126,13 @@ const EmployeeList = () => {
             icon: "success",
             title: "Deleted Successfully!",
           });
-          const updatedEmployees = employees?.filter(
+          const updatedEmployees = state.employees.filter(
             (employee) => employee._id !== id
           );
-          setEmployees(updatedEmployees);
+          dispatch({
+            type: "FETCH_EMPLOYEES_SUCCESS",
+            payload: updatedEmployees,
+          });
           closeModal();
         } else {
           Swal.fire({

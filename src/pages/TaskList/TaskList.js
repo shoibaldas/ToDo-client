@@ -22,9 +22,9 @@ const TaskList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const tasksResponse = await axios.get("http://localhost:5000/tasks");
+        const tasksResponse = await axios.get("https://to-do-server-pi.vercel.app/tasks");
         const employeesResponse = await axios.get(
-          "http://localhost:5000/employees"
+          "https://to-do-server-pi.vercel.app/employees"
         );
         setTasks(tasksResponse.data.data);
         setEmployees(employeesResponse.data.data);
@@ -78,6 +78,7 @@ const TaskList = () => {
     }
   }, [selectedTask]);
 
+  //transfer the data to modal upon clicking
   const handleEditTaskClick = (id, taskName) => {
     const selected = tasks.find((task) => task._id === id);
     setSelectedTask(selected);
@@ -85,6 +86,7 @@ const TaskList = () => {
     setShowModal(true);
   };
 
+  //transfer the data to modal upon clicking
   const handleItemClickForTransfer = (id) => {
     const selected = tasks.find((task) => task._id === id);
     setSelectedTask(selected);
@@ -108,10 +110,10 @@ const TaskList = () => {
     if (selectedTask) {
       const newTaskData = {
         ...selectedTask,
-        name: editTask.name, // Update the task name directly
+        name: editTask.name,
       };
 
-      fetch(`http://localhost:5000/update/task/${selectedTask._id}`, {
+      fetch(`https://to-do-server-pi.vercel.app/update/task/${selectedTask._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +152,7 @@ const TaskList = () => {
     const updatedTask = { ...selectedTask };
     updatedTask.employeeId = selectedEmployeeId;
 
-    fetch(`http://localhost:5000/transfer/employee/${selectedTask._id}`, {
+    fetch(`https://to-do-server-pi.vercel.app/transfer/employee/${selectedTask._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -185,7 +187,7 @@ const TaskList = () => {
 
   //Deleting a task
   const handleDeleteClick = (id) => {
-    fetch(`http://localhost:5000/delete/task/${id}`, {
+    fetch(`https://to-do-server-pi.vercel.app/delete/task/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
