@@ -10,6 +10,7 @@ import TaskTransferModal from "../../components/TaskTransferModal/TaskTransferMo
 
 const TaskList = () => {
   const [tasks, setTasks] = useState([]);
+  const [employees, setEmployees] = useState([]);
   const [expandedTaskDetails, setExpandedTaskDetails] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalTransfer, setshowModalTransfer] = useState(false);
@@ -17,18 +18,34 @@ const TaskList = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  //fetching task data from employee data
+  //fetching task data from employee and task data
   useEffect(() => {
-    axios
-      .get("https://to-do-server-pi.vercel.app/employees")
-      .then((response) => {
-        setTasks(response.data.data);
+    const fetchData = async () => {
+      try {
+        const tasksResponse = await axios.get("http://localhost:5000/tasks");
+        const employeesResponse = await axios.get(
+          "http://localhost:5000/employees"
+        );
+        setTasks(tasksResponse.data.data);
+        setEmployees(employeesResponse.data.data);
         setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  const combinedData = tasks?.map((task) => {
+    const employee = employees?.find((emp) => emp._id === task.employeeId);
+    return {
+      taskId: task._id,
+      taskName: task.name,
+      employeeId: employee ? employee._id : "",
+      employeeName: employee ? employee.name : "",
+    };
+  });
 
   //toggle to show the more data for task assigned
   const toggleExpand = (taskId) => {
@@ -54,9 +71,17 @@ const TaskList = () => {
     setIsEditing(true);
   };
 
-  const handleItemClick = (id) => {
+  // for effecting the changes while editting
+  useEffect(() => {
+    if (selectedTask) {
+      setEditTask({ name: selectedTask.name });
+    }
+  }, [selectedTask]);
+
+  const handleEditTaskClick = (id, taskName) => {
     const selected = tasks.find((task) => task._id === id);
     setSelectedTask(selected);
+    setEditTask({ name: taskName });
     setShowModal(true);
   };
 
@@ -70,15 +95,8 @@ const TaskList = () => {
   const [editTask, setEditTask] = useState({ name: "" });
   const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
 
-  // for effecting the changes while editting
-  useEffect(() => {
-    if (selectedTask && selectedTask.task) {
-      setEditTask({ name: selectedTask.task.name });
-    }
-  }, [selectedTask]);
-
+  //Onchange in the input field
   const handleChange = (field, value) => {
-    //Onchange in the input field
     setEditTask((prevTask) => ({
       ...prevTask,
       [field]: value,
@@ -87,82 +105,57 @@ const TaskList = () => {
 
   //editing task name and updating
   const handleSaveClick = () => {
-    const newTaskData = {
-      ...selectedTask,
-      task: {
-        ...selectedTask.task,
+    if (selectedTask) {
+      const newTaskData = {
+        ...selectedTask,
         name: editTask.name, // Update the task name directly
-      },
-    };
+      };
 
-    console.log(newTaskData);
-
-    fetch(
-      `https://to-do-server-pi.vercel.app/update/task/${selectedTask._id}`,
-      {
+      fetch(`http://localhost:5000/update/task/${selectedTask._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(newTaskData),
-      }
-    )
-      .then((response) => response.json())
-      .then((responseData) => {
-        console.log("Success:", responseData);
-        if (responseData.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Updated Successfully!",
-          });
-          const updatedTask = tasks?.map((taskData) =>
-            taskData._id === selectedTask._id ? newTaskData : taskData
-          );
-          setTasks(updatedTask);
-          setIsEditing(false);
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Something went wrong, try again!",
-          });
-        }
       })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+        .then((response) => response.json())
+        .then((responseData) => {
+          console.log("Success:", responseData);
+          if (responseData.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Updated Successfully!",
+            });
+            const updatedTask = tasks?.map((taskData) =>
+              taskData._id === selectedTask._id ? newTaskData : taskData
+            );
+            setTasks(updatedTask);
+            setIsEditing(false);
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong, try again!",
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }
   };
 
+  //transffering task
   const handleTransferClick = () => {
-    const transferToEmployee = tasks.find(
-      (employee) => employee._id === selectedEmployeeId
-    );
+    const updatedTask = { ...selectedTask };
+    updatedTask.employeeId = selectedEmployeeId;
 
-    // Updating the task list
-    const updatedTaskList = tasks.map((employee) => {
-      if (employee._id === selectedTask._id) {
-        return {
-          ...employee,
-          task: null,
-        };
-      } else if (employee._id === transferToEmployee._id) {
-        return {
-          ...employee,
-          task: selectedTask.task,
-        };
-      } else {
-        return employee;
-      }
-    });
-
-    setTasks(updatedTaskList);
-
-    fetch(`https://to-do-server-pi.vercel.app/transfer/employee`, {
+    fetch(`http://localhost:5000/transfer/employee/${selectedTask._id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedTaskList), // Send only the updated task data
+      body: JSON.stringify(updatedTask),
     })
       .then((response) => response.json())
       .then((responseData) => {
@@ -172,6 +165,10 @@ const TaskList = () => {
             icon: "success",
             title: "Task Transferred Successfully!",
           });
+          const updatedTasks = tasks?.map((task) =>
+            task._id === selectedTask._id ? updatedTask : task
+          );
+          setTasks(updatedTasks);
           closeModal();
         } else {
           Swal.fire({
@@ -188,7 +185,7 @@ const TaskList = () => {
 
   //Deleting a task
   const handleDeleteClick = (id) => {
-    fetch(`https://to-do-server-pi.vercel.app/delete/task/${id}`, {
+    fetch(`http://localhost:5000/delete/task/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
@@ -199,15 +196,7 @@ const TaskList = () => {
             icon: "success",
             title: "Task Deleted Successfully!",
           });
-          const updatedTasks = tasks.map((taskList) => {
-            if (taskList._id === id) {
-              // Remove the 'task' attribute from the employee
-              const { task, ...updatedEmployee } = taskList;
-              return updatedEmployee;
-            }
-            return taskList;
-          });
-          setTasks(updatedTasks);
+          setTasks((prevTasks) => prevTasks.filter((task) => task._id !== id));
         } else {
           Swal.fire({
             icon: "error",
@@ -225,48 +214,45 @@ const TaskList = () => {
     return <Loader></Loader>;
   }
 
-  //filtering out the task attribute from the employee array
-  const filteredTasks = tasks?.filter((task) => task.task);
-
   return (
     <div className="container mx-auto px-4">
       <h2 className="text-2xl font-bold mb-4">Task List</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {filteredTasks?.map((task) => (
+        {combinedData?.map((data) => (
           <div
-            key={task._id}
+            key={data.taskId}
             className={`bg-sky-700 text-gray-100 shadow-md rounded-md p-4 ${
-              expandedTaskDetails.includes(task._id) ? "h-auto" : "h-20"
+              expandedTaskDetails.includes(data.taskId) ? "h-auto" : "h-20"
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-md font-semibold">{task.task.name}</h3>
+              <h3 className="text-md font-semibold">{data.taskName}</h3>
               <button
-                onClick={() => toggleExpand(task._id)}
+                onClick={() => toggleExpand(data.taskId)}
                 className="text-gray-100 focus:outline-none"
               >
-                {expandedTaskDetails.includes(task._id) ? (
+                {expandedTaskDetails.includes(data.taskId) ? (
                   <HiOutlineChevronUp className="h-5 w-5" />
                 ) : (
                   <HiOutlineChevronDown className="h-5 w-5" />
                 )}
               </button>
             </div>
-            {expandedTaskDetails.includes(task._id) && (
+            {expandedTaskDetails.includes(data.taskId) && (
               <div>
                 <div className="border-t border-gray-200 pt-2 mb-6">
                   <div className="flex items-center">
                     <div>
                       <p className="text-sm">
                         <span className="font-semibold">Assigned to:</span>{" "}
-                        {task.name}
+                        {data.employeeName}
                       </p>
                     </div>
                     <div className="mx-3">
                       <button
                         className="px-2 bg-black text-white py-1 text-sm rounded hover:shadow-lg"
-                        onClick={() => handleItemClickForTransfer(task._id)}
+                        onClick={() => handleItemClickForTransfer(data.taskId)}
                       >
                         Change?
                       </button>
@@ -276,14 +262,16 @@ const TaskList = () => {
                 <div className="flex justify-between">
                   <button
                     className="inline-flex items-center border border-orange-600 px-2 bg-orange-800 text-white py-1 text-sm rounded hover:shadow-lg"
-                    onClick={() => handleDeleteClick(task._id)}
+                    onClick={() => handleDeleteClick(data.taskId)}
                   >
                     Delete Task
                     <MdOutlineDelete className="mx-1"></MdOutlineDelete>
                   </button>
                   <button
                     className="inline-flex items-center border border-blue-900 px-2 bg-gray-800 text-white py-1 text-sm rounded hover:shadow-lg"
-                    onClick={() => handleItemClick(task._id)}
+                    onClick={() =>
+                      handleEditTaskClick(data.taskId, data.taskName)
+                    }
                   >
                     Edit Task
                     <AiOutlineEdit className="mx-1"></AiOutlineEdit>
@@ -304,7 +292,7 @@ const TaskList = () => {
           selectedTask={selectedTask}
           selectedEmployeeId={selectedEmployeeId}
           setSelectedEmployeeId={setSelectedEmployeeId}
-          tasks={tasks}
+          tasks={employees}
         ></TaskTransferModal>
       )}
       {showModal && (

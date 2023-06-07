@@ -1,12 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { v4 as uuidv4 } from "uuid";
 
 const CreateTask = () => {
   const [employees, setEmployees] = useState([]);
-
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -16,12 +16,13 @@ const CreateTask = () => {
     mode: "onChange",
     defaultValues: {
       taskName: "",
+      employeeId: "",
     },
   });
 
   useEffect(() => {
     axios
-      .get("https://to-do-server-pi.vercel.app/employees")
+      .get("http://localhost:5000/employees")
       .then((response) => {
         setEmployees(response.data.data);
       })
@@ -31,48 +32,40 @@ const CreateTask = () => {
   }, []);
 
   const onSubmit = (data) => {
-    const { employeeName, taskName } = data;
-    const taskId = uuidv4();
+    const { employeeId, taskName } = data;
 
-    const selectedEmployee = JSON.parse(employeeName);
-
-    if (selectedEmployee) {
-      const updatedEmployee = {
-        ...selectedEmployee,
-        task: {
-          id: taskId, // Add the taskId to the task object
-          name: taskName,
-        },
-      };
-
-      fetch(`https://to-do-server-pi.vercel.app/employees/${selectedEmployee._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedEmployee),
+    const newTask = {
+      name: taskName,
+      employeeId: employeeId,
+    };
+    fetch(`http://localhost:5000/tasks`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newTask),
+    })
+      .then((response) => response.json())
+      .then((responseData) => {
+        console.log("Success:", responseData);
+        if (responseData.success) {
+          Swal.fire({
+            icon: "success",
+            title: "Task Added Successfully!",
+          });
+          reset();
+          navigate("/task-list");
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong, try again!",
+          });
+        }
       })
-        .then((response) => response.json())
-        .then((responseData) => {
-          console.log("Success:", responseData);
-          if (responseData.success) {
-            Swal.fire({
-              icon: "success",
-              title: "Task Added Successfully!",
-            });
-            reset();
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: "Something went wrong, try again!",
-            });
-          }
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   return (
@@ -81,35 +74,26 @@ const CreateTask = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 gap-6 mb-4">
           {/* Employee Name */}
-
           <div className="flex flex-col">
-            <label htmlFor="employeeName" className="font-medium block">
+            <label htmlFor="employeeId" className="font-medium block">
               Employee Name
             </label>
             <select
-              {...register("employeeName", {
+              {...register("employeeId", {
                 required: "Employee name is required",
               })}
               className="form-select bg-gray-100 border border-gray-300 px-3 py-1 rounded-md"
             >
               <option value="">Select an employee</option>
-              {employees?.map((employee) => {
-                const ifTaskExist =
-                  employee.task && Object.keys(employee.task).length > 0;
-
-                if (!ifTaskExist) {
-                  return (
-                    <option key={employee._id} value={JSON.stringify(employee)}>
-                      {employee.name}
-                    </option>
-                  );
-                }
-                return null;
-              })}
+              {employees?.map((employee) => (
+                <option key={employee._id} value={employee._id}>
+                  {employee.name}
+                </option>
+              ))}
             </select>
-            {errors.employeeName && (
+            {errors.employeeId && (
               <span className="text-red-500 text-sm">
-                {errors.employeeName.message}
+                {errors.employeeId.message}
               </span>
             )}
           </div>
@@ -135,7 +119,7 @@ const CreateTask = () => {
         <div className="grid grid-cols-1">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md "
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
           >
             Assign
           </button>

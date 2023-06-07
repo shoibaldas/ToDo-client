@@ -11,7 +11,7 @@ const TaskTransferModal = ({
   handleTransferClick,
   handleEditClick,
 }) => {
-    
+  console.log(selectedEmployeeId);
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 p-3">
       <div className="bg-white p-6 rounded shadow-md h-40">
@@ -29,19 +29,11 @@ const TaskTransferModal = ({
                   onChange={(e) => setSelectedEmployeeId(e.target.value)}
                 >
                   <option value="">Select an available employee</option>
-                  {tasks?.map((employee) => {
-                    const ifTaskExist =
-                      employee.task && Object.keys(employee.task).length > 0;
-
-                    if (!ifTaskExist) {
-                      return (
-                        <option key={employee._id} value={employee._id}>
-                          {employee.name}
-                        </option>
-                      );
-                    }
-                    return null;
-                  })}
+                  {tasks?.map((employee) => (
+                    <option key={employee._id} value={employee._id}>
+                      {employee.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>

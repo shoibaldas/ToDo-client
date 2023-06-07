@@ -15,7 +15,7 @@ const EmployeeList = () => {
   //for fetching employee data
   useEffect(() => {
     axios
-      .get("https://to-do-server-pi.vercel.app/employees")
+      .get("http://localhost:5000/employees")
       .then((response) => {
         setEmployees(response.data.data);
         setLoading(false);
@@ -83,7 +83,7 @@ const EmployeeList = () => {
     };
 
     fetch(
-      `https://to-do-server-pi.vercel.app/update/employee/${selectedEmployee._id}`,
+      `http://localhost:5000/update/employee/${selectedEmployee._id}`,
       {
         method: "PUT",
         headers: {
@@ -122,7 +122,7 @@ const EmployeeList = () => {
   const handleDeleteClick = (id) => {
     console.log(id);
 
-    fetch(`https://to-do-server-pi.vercel.app/delete/employee/${id}`, {
+    fetch(`http://localhost:5000/delete/employee/${id}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
